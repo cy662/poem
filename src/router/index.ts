@@ -1,8 +1,14 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
 
-// 路由配置
-const routes: RouteRecordRaw[] = [
+// 1. 定义路由元信息的 TypeScript 接口（增强类型约束）
+interface RouteMeta {
+  title: string;        // 页面标题（必选）
+  description: string;  // 页面描述（必选）
+}
+
+// 2. 路由配置（指定元信息类型为 RouteMeta）
+const routes: RouteRecordRaw<RouteMeta>[] = [
   {
     path: '/',
     name: 'Home',
@@ -59,12 +65,12 @@ const routes: RouteRecordRaw[] = [
   }
 ]
 
-// 创建路由实例
+// 3. 创建路由实例
 const router = createRouter({
   history: createWebHistory(),
   routes,
   scrollBehavior(to, from, savedPosition) {
-    // 路由切换时的滚动行为
+    // 路由切换时的滚动行为：优先恢复保存的位置，否则滚动到顶部
     if (savedPosition) {
       return savedPosition
     } else {
@@ -73,29 +79,25 @@ const router = createRouter({
   }
 })
 
-// 全局前置守卫
-router.beforeEach((to, from, next) => {
-  // 设置页面标题
-  if (to.meta?.title) {
-    document.title = to.meta.title as string
+// 4. 全局前置守卫（用 _ 代替未使用的 from 参数，解决 TS6133 错误）
+router.beforeEach((to, _, next) => {
+  // 设置页面标题（利用 RouteMeta 接口确保 title 存在，无需额外判断 undefined）
+  document.title = to.meta.title
+
+  // 设置页面描述（处理 meta 标签可能不存在的情况）
+  const metaDescription = document.querySelector('meta[name="description"]')
+  if (metaDescription) {
+    metaDescription.setAttribute('content', to.meta.description)
   }
-  
-  // 设置页面描述
-  if (to.meta?.description) {
-    const metaDescription = document.querySelector('meta[name="description"]')
-    if (metaDescription) {
-      metaDescription.setAttribute('content', to.meta.description as string)
-    }
-  }
-  
-  next()
+
+  next() // 必须调用 next() 放行路由
 })
 
-// 全局后置钩子
-router.afterEach((to, from) => {
-  // 页面访问统计（开发环境下的调试信息）
+// 5. 全局后置钩子（用 _ 代替未使用的 from 参数，解决 TS6133 错误）
+router.afterEach((to, _) => {
+  // 开发环境下打印导航日志（依赖 import.meta.env.DEV，需配合 src/env.d.ts 类型声明）
   if (import.meta.env.DEV) {
-    console.log(`🚀 导航到: ${to.path}`)
+    console.log(`🚀 导航完成：当前路径 -> ${to.path}`)
   }
 })
 

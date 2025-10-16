@@ -94,14 +94,29 @@ export const usePoemStore = defineStore('poem', () => {
     selectedCategory.value = ''
   }
 
-  // 添加新诗词（预留功能）
-  const addPoem = (poem: Omit<Poem, 'id' | 'createdAt'>) => {
-    const newPoem: Poem = {
-      ...poem,
-      id: Date.now().toString(),
-      createdAt: new Date().toISOString().split('T')[0]
+  // 添加新诗词
+  const addPoem = async (poem: Omit<Poem, 'id' | 'createdAt'>) => {
+    loading.value = true
+    error.value = null
+
+    try {
+      // 调用Supabase服务添加诗词到数据库
+      const newPoem = await supabaseService.addPoem({
+        ...poem,
+        category: poem.category || '未分类' // 确保有默认分类
+      })
+
+      // 更新本地状态
+      poems.value.unshift(newPoem)
+
+      return newPoem
+    } catch (err) {
+      error.value = '添加诗词失败'
+      console.error('添加诗词错误:', err)
+      throw err
+    } finally {
+      loading.value = false
     }
-    poems.value.push(newPoem)
   }
 
   return {

@@ -85,7 +85,8 @@ const navItems = [
   { name: '首页', path: '/' },
   { name: '诗词', path: '/poems' },
   { name: '作者', path: '/authors' },
-  { name: '搜索', path: '/search' }
+  { name: '搜索', path: '/search' },
+  { name: '添加诗词', path: '/add-poem' }
 ]
 
 // 搜索处理

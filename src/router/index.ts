@@ -64,6 +64,15 @@ const routes: RouteRecordRaw[] = [
     }
   },
   {
+    path: '/add-poem',
+    name: 'AddPoem',
+    component: () => import('@/views/AddPoemView.vue'),
+    meta: {
+      title: '添加诗词 - 诗词雅集',
+      description: '添加新的诗词作品'
+    }
+  },
+  {
     path: '/:pathMatch(.*)*',
     name: 'NotFound',
     component: () => import('@/views/NotFoundView.vue'),

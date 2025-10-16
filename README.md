@@ -1,128 +1,198 @@
-# Vue.js 诗词项目 🌸
+# 诗词雅集 - 基于Supabase的诗词管理应用
 
-一个基于Vue 3的现代化诗词管理应用，展示中华诗词文化的美妙。
+## 项目简介
 
-## 项目特性
+这是一个基于Vue 3 + TypeScript + Pinia + Supabase的诗词管理应用，提供诗词浏览、搜索、分类和管理功能。
 
-- ✨ **Vue 3 + Composition API** - 使用最新的Vue 3语法
-- 🎯 **TypeScript** - 完整的类型支持
-- 🗂 **Pinia** - 现代化的状态管理
-- 🚦 **Vue Router** - 单页面应用路由
-- 📱 **响应式设计** - 适配各种设备
-- 🎨 **现代化UI** - 美观的用户界面
+## 功能特性
 
-## 项目结构
+- 📚 **诗词浏览**: 查看历代诗词作品
+- 🔍 **智能搜索**: 按标题、作者、内容搜索
+- 🏷️ **分类管理**: 按主题分类浏览诗词
+- 👤 **作者信息**: 了解诗词作者生平
+- 🛠️ **管理后台**: 添加和管理诗词数据
+- ☁️ **云端存储**: 基于Supabase的实时数据同步
 
-```
-poem/
-├── public/                 # 静态资源
-│   ├── index.html         # HTML模板
-│   └── favicon.ico        # 网站图标
-├── src/                   # 源代码
-│   ├── components/        # 公共组件
-│   ├── views/            # 页面组件
-│   ├── router/           # 路由配置
-│   ├── stores/           # Pinia状态管理
-│   ├── types/            # TypeScript类型定义
-│   ├── utils/            # 工具函数
-│   ├── assets/           # 静态资源
-│   ├── App.vue           # 根组件
-│   └── main.ts           # 应用入口
-├── package.json          # 项目依赖
-├── vite.config.ts        # Vite配置
-├── tsconfig.json         # TypeScript配置
-└── README.md             # 项目说明
-```
+## 技术栈
 
-## 功能模块
-
-### 1. 诗词展示 📖
-- 诗词列表展示
-- 诗词详情查看
-- 按朝代、作者分类
-- 搜索功能
-
-### 2. 用户体验 🎭
-- 响应式设计
-- 流畅的页面切换
-- 优雅的加载动画
-- 错误处理机制
-
-### 3. 状态管理 🗃️
-- 诗词数据管理
-- 用户偏好设置
-- 搜索历史记录
+- **前端框架**: Vue 3 + TypeScript
+- **状态管理**: Pinia
+- **路由管理**: Vue Router
+- **UI组件**: 原生CSS + 响应式设计
+- **后端服务**: Supabase (PostgreSQL + 实时API)
+- **构建工具**: Vite
 
 ## 快速开始
 
-### 1. 安装依赖
+### 环境要求
+
+- Node.js 16+
+- npm 或 yarn
+
+### 安装依赖
+
 ```bash
 npm install
 ```
 
-### 2. 启动开发服务器
+### 配置环境变量
+
+复制环境配置文件并设置Supabase连接信息：
+
+```bash
+cp .env.development .env.local
+```
+
+编辑 `.env.local` 文件，设置您的Supabase配置：
+
+```env
+VITE_SUPABASE_URL=您的Supabase项目URL
+VITE_SUPABASE_ANON_KEY=您的Supabase匿名密钥
+```
+
+### 启动开发服务器
+
 ```bash
 npm run dev
 ```
-项目将在 http://localhost:3000 启动
 
-### 3. 构建生产版本
+### 构建生产版本
+
 ```bash
 npm run build
 ```
 
-### 4. 预览构建结果
-```bash
-npm run preview
+## Supabase数据库设置
+
+### 1. 创建Supabase项目
+
+1. 访问 [Supabase官网](https://supabase.com)
+2. 创建新项目
+3. 获取项目URL和匿名密钥
+
+### 2. 初始化数据库表
+
+在Supabase SQL编辑器中执行 `scripts/init-database.sql` 脚本：
+
+```sql
+-- 执行 scripts/init-database.sql 中的SQL语句
 ```
 
-## 当前项目状态
+### 3. 配置表权限
 
-✅ **已完成功能**
-- [x] Vue 3 + TypeScript 项目结构
-- [x] Pinia 状态管理配置
-- [x] Vue Router 路由配置
-- [x] 响应式UI设计
-- [x] 首页欢迎界面
-- [x] 诗词列表页面
-- [x] 诗词详情页面
-- [x] 作者列表页面
-- [x] 搜索功能页面
-- [x] 404错误页面
-- [x] 示例诗词数据
-- [x] 完整的样式系统
+确保为匿名用户设置适当的表权限：
 
-🚀 **项目特色**
-- 现代化的Vue 3 Composition API
-- 完整的TypeScript类型支持
-- 美观的响应式设计
-- 流畅的页面切换动画
-- 直观的搜索和筛选功能
-- 移动端友好的界面
+```sql
+-- 允许匿名用户读取诗词数据
+ALTER TABLE poems ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "允许匿名用户读取诗词" ON poems FOR SELECT USING (true);
 
-## 技术栈说明
+-- 允许匿名用户读取作者数据
+ALTER TABLE authors ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "允许匿名用户读取作者" ON authors FOR SELECT USING (true);
 
-- **Vue 3**: 使用Composition API，提供更好的逻辑复用和类型推导
-- **TypeScript**: 提供类型安全，减少运行时错误
-- **Pinia**: 轻量级状态管理，替代Vuex
-- **Vue Router**: 官方路由管理器
-- **Vite**: 快速的构建工具
+-- 允许匿名用户读取分类数据
+ALTER TABLE categories ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "允许匿名用户读取分类" ON categories FOR SELECT USING (true);
+```
 
-## 开发规范
+## 项目结构
 
-- 使用Composition API和setup语法糖
-- 组件采用单文件组件(SFC)格式
-- 遵循Vue.js官方风格指南
-- 使用TypeScript进行类型检查
-- 合理使用响应式API(ref、reactive等)
+```
+src/
+├── components/     # 可复用组件
+├── views/          # 页面组件
+├── stores/         # Pinia状态管理
+├── services/       # 数据服务层
+├── lib/            # 工具库和配置
+├── router/         # 路由配置
+├── types/          # TypeScript类型定义
+└── assets/         # 静态资源
+```
 
-## 项目亮点
+## 主要功能模块
 
-- 🚀 **性能优化**: 代码分割、懒加载
-- 🛡️ **类型安全**: 完整的TypeScript支持
-- 📦 **模块化**: 清晰的项目结构
-- 🎨 **用户体验**: 现代化的界面设计
+### 1. 诗词管理 (`src/stores/poem.ts`)
 
----
+- 诗词数据的获取和管理
+- 搜索和筛选功能
+- 作者信息管理
 
-*本项目使用Vue 3最新特性开发，展示现代前端开发的最佳实践。*
+### 2. Supabase服务 (`src/services/supabaseService.ts`)
+
+- 诗词CRUD操作
+- 作者信息查询
+- 分类数据管理
+
+### 3. 管理后台 (`src/views/AdminView.vue`)
+
+- 添加新诗词
+- 查看数据统计
+- 管理现有数据
+
+## API接口说明
+
+### 诗词相关接口
+
+- `GET /poems` - 获取所有诗词
+- `GET /poems/:id` - 获取指定诗词详情
+- `POST /poems` - 添加新诗词
+- `GET /poems/search?q=关键词` - 搜索诗词
+
+### 作者相关接口
+
+- `GET /authors` - 获取所有作者
+- `GET /authors/:id` - 获取指定作者详情
+- `GET /authors/dynasty/:dynasty` - 按朝代获取作者
+
+## 开发指南
+
+### 添加新功能
+
+1. 在 `src/types/poem.ts` 中定义数据类型
+2. 在 `src/services/supabaseService.ts` 中添加服务方法
+3. 在 `src/stores/poem.ts` 中更新状态管理
+4. 创建或更新相关组件
+
+### 数据模型
+
+参考 `src/types/poem.ts` 中的类型定义：
+
+```typescript
+interface Poem {
+  id: string
+  title: string
+  author: string
+  dynasty: string
+  category: string
+  content: string
+  translation?: string
+  annotation?: string
+  tags: string[]
+  createdAt: string
+}
+```
+
+## 部署说明
+
+### Vercel部署
+
+1. 连接GitHub仓库到Vercel
+2. 设置环境变量
+3. 部署项目
+
+### 其他平台
+
+确保设置正确的环境变量和构建配置。
+
+## 贡献指南
+
+欢迎提交Issue和Pull Request来改进项目。
+
+## 许可证
+
+MIT License
+
+## 联系方式
+
+如有问题请联系项目维护者。

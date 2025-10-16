@@ -60,7 +60,7 @@
             </div>
           </div>
           <div class="poem-content">
-            {{ poem.content.split('\n').slice(0, 2).join('\n') }}
+            {{ poem.content.replace(/\\\\n|\\n/g, '\n').split('\n').slice(0, 2).join('\n') }}
           </div>
         </div>
       </div>

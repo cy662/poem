@@ -21,7 +21,7 @@
 
         <div class="poem-content-section">
           <div class="poem-content">
-            {{ poem.content }}
+            {{ poem.content.replace(/\\\\n|\\n/g, '\n') }}
           </div>
         </div>
 
@@ -63,7 +63,7 @@
           >
             <h4 class="related-poem-title">{{ relatedPoem.title }}</h4>
             <p class="related-poem-preview">
-              {{ relatedPoem.content.split('\n')[0] }}...
+              {{ relatedPoem.content.replace(/\\\\n|\\n/g, '\n').split('\n')[0] }}...
             </p>
           </div>
         </div>

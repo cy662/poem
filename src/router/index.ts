@@ -7,8 +7,8 @@ interface RouteMeta {
   description: string;  // 页面描述（必选）
 }
 
-// 2. 路由配置（指定元信息类型为 RouteMeta）
-const routes: RouteRecordRaw<RouteMeta>[] = [
+// 2. 路由配置
+const routes: RouteRecordRaw[] = [
   {
     path: '/',
     name: 'Home',
@@ -55,6 +55,15 @@ const routes: RouteRecordRaw<RouteMeta>[] = [
     }
   },
   {
+    path: '/admin',
+    name: 'Admin',
+    component: () => import('@/views/AdminView.vue'),
+    meta: {
+      title: '管理 - 诗词雅集',
+      description: '管理诗词数据和作者信息'
+    }
+  },
+  {
     path: '/:pathMatch(.*)*',
     name: 'NotFound',
     component: () => import('@/views/NotFoundView.vue'),
@@ -81,12 +90,16 @@ const router = createRouter({
 
 // 4. 全局前置守卫（用 _ 代替未使用的 from 参数，解决 TS6133 错误）
 router.beforeEach((to, _, next) => {
-  // 设置页面标题（利用 RouteMeta 接口确保 title 存在，无需额外判断 undefined）
-  document.title = to.meta.title
+  // 设置页面标题
+  if (to.meta && typeof to.meta.title === 'string') {
+    document.title = to.meta.title
+  } else {
+    document.title = '诗词雅集'
+  }
 
   // 设置页面描述（处理 meta 标签可能不存在的情况）
   const metaDescription = document.querySelector('meta[name="description"]')
-  if (metaDescription) {
+  if (metaDescription && to.meta && typeof to.meta.description === 'string') {
     metaDescription.setAttribute('content', to.meta.description)
   }
 

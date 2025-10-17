@@ -4,7 +4,7 @@
       <div class="header-content">
         <!-- Logo和标题 -->
         <div class="header-brand">
-          <RouterLink to="/" class="brand-link">
+          <RouterLink to="/home" class="brand-link">
             <h1 class="brand-title">诗词雅集</h1>
             <span class="brand-subtitle">品味中华诗词之美</span>
           </RouterLink>
@@ -37,6 +37,11 @@
           </button>
         </div>
 
+        <!-- 用户认证组件 -->
+        <div class="header-auth">
+          <UserAuth />
+        </div>
+
         <!-- 移动端菜单按钮 -->
         <button 
           class="mobile-menu-btn"
@@ -61,6 +66,10 @@
           >
             {{ item.name }}
           </RouterLink>
+          <!-- 移动端用户认证链接 -->
+          <div class="mobile-auth-links">
+            <UserAuth mobile />
+          </div>
         </div>
       </Transition>
     </div>
@@ -71,6 +80,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { usePoemStore } from '@/stores/poem'
+import UserAuth from './UserAuth.vue'
 
 // 路由和状态管理
 const router = useRouter()
@@ -82,7 +92,7 @@ const showMobileMenu = ref(false)
 
 // 导航菜单配置
 const navItems = [
-  { name: '首页', path: '/' },
+  { name: '首页', path: '/home' },
   { name: '诗词', path: '/poems' },
   { name: '作者', path: '/authors' },
   { name: '搜索', path: '/search' },
@@ -189,6 +199,11 @@ const closeMobileMenu = () => {
   flex-shrink: 0;
 }
 
+/* 用户认证区域 */
+.header-auth {
+  flex-shrink: 0;
+}
+
 .search-input {
   background: transparent;
   border: none;
@@ -278,6 +293,13 @@ const closeMobileMenu = () => {
   text-decoration: none;
 }
 
+/* 移动端用户认证链接 */
+.mobile-auth-links {
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+}
+
 /* 动画效果 */
 .slide-enter-active,
 .slide-leave-active {
@@ -301,6 +323,10 @@ const closeMobileMenu = () => {
   }
 
   .header-search {
+    display: none;
+  }
+
+  .header-auth {
     display: none;
   }
 

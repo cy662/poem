@@ -93,13 +93,47 @@ ALTER TABLE categories ENABLE ROW LEVEL SECURITY;
 ALTER TABLE authors ENABLE ROW LEVEL SECURITY;
 ALTER TABLE poems ENABLE ROW LEVEL SECURITY;
 
--- 创建允许匿名访问的策略（根据实际需求调整）
-CREATE POLICY "允许匿名访问分类" ON categories FOR SELECT USING (true);
-CREATE POLICY "允许匿名访问作者" ON authors FOR SELECT USING (true);
-CREATE POLICY "允许匿名访问诗词" ON poems FOR SELECT USING (true);
+-- 创建用户角色表（用于更精细的权限控制）
+CREATE TABLE IF NOT EXISTS user_roles (
+  id UUID REFERENCES auth.users(id) PRIMARY KEY,
+  role VARCHAR(20) NOT NULL DEFAULT 'user',
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
 
--- 创建允许插入的策略（如果需要用户添加数据）
-CREATE POLICY "允许插入诗词" ON poems FOR INSERT WITH CHECK (true);
+-- 为用户角色表启用RLS
+ALTER TABLE user_roles ENABLE ROW LEVEL SECURITY;
+
+-- 分类表RLS策略
+CREATE POLICY "允许所有人查看分类" ON categories FOR SELECT USING (true);
+CREATE POLICY "允许管理员管理分类" ON categories FOR ALL USING (
+  EXISTS (SELECT 1 FROM user_roles WHERE user_roles.id = auth.uid() AND user_roles.role = 'admin')
+);
+
+-- 作者表RLS策略
+CREATE POLICY "允许所有人查看作者" ON authors FOR SELECT USING (true);
+CREATE POLICY "允许管理员管理作者" ON authors FOR ALL USING (
+  EXISTS (SELECT 1 FROM user_roles WHERE user_roles.id = auth.uid() AND user_roles.role = 'admin')
+);
+
+-- 诗词表RLS策略
+CREATE POLICY "允许所有人查看诗词" ON poems FOR SELECT USING (true);
+CREATE POLICY "允许用户添加诗词" ON poems FOR INSERT WITH CHECK (
+  auth.uid() IS NOT NULL AND
+  EXISTS (SELECT 1 FROM user_roles WHERE user_roles.id = auth.uid() AND user_roles.role IN ('user', 'admin'))
+);
+CREATE POLICY "允许管理员管理诗词" ON poems FOR ALL USING (
+  EXISTS (SELECT 1 FROM user_roles WHERE user_roles.id = auth.uid() AND user_roles.role = 'admin')
+);
+
+-- 用户角色表RLS策略
+CREATE POLICY "用户只能查看自己的角色" ON user_roles FOR SELECT USING (auth.uid() = id);
+CREATE POLICY "允许管理员管理所有角色" ON user_roles FOR ALL USING (
+  EXISTS (SELECT 1 FROM user_roles WHERE user_roles.id = auth.uid() AND user_roles.role = 'admin')
+);
+
+-- 创建默认管理员用户（需要在实际部署时设置）
+-- 注意：这需要在Supabase Auth中创建用户后手动执行
+-- INSERT INTO user_roles (id, role) VALUES ('admin-user-uuid', 'admin');
 
 -- 创建统计视图
 CREATE OR REPLACE VIEW poem_stats AS

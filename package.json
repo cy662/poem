@@ -8,7 +8,11 @@
     "vercel-build": "chmod +x node_modules/.bin/vite && npm run build",
     "build": "vite build",
     "preview": "vite preview",
-    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore"
+    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
+    "deploy-rls": "powershell -ExecutionPolicy Bypass -File scripts/deploy-rls.ps1",
+    "setup-db": "npm run deploy-rls",
+    "db:init": "echo '请在Supabase SQL编辑器中执行 scripts/init-database.sql'",
+    "db:rls": "echo '请在Supabase SQL编辑器中执行 scripts/simple-rls-setup.sql'"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.75.0",

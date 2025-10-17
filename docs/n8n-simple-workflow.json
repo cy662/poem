@@ -1,0 +1,67 @@
+{
+  "name": "诗词AI助手简单版",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "poem-ai",
+        "responseMode": "lastNode"
+      },
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const question = $input.first().json.question;\n\n// 简单的诗词知识库\nconst knowledge = {\n  '李白': '李白是唐代伟大的浪漫主义诗人，被后人誉为\"诗仙\"。代表作品有《静夜思》、《将进酒》、《蜀道难》等。',\n  '杜甫': '杜甫是唐代伟大的现实主义诗人，被尊为\"诗圣\"。代表作品有《春望》、《登高》、《茅屋为秋风所破歌》等。',\n  '苏轼': '苏轼是北宋文学家、书画家，豪放派词人代表。代表作品有《水调歌头》、《念奴娇·赤壁怀古》等。',\n  '唐诗': '唐诗是中国古典诗歌的黄金时代，分为初唐、盛唐、中唐、晚唐四个时期。',\n  '宋词': '宋词是宋代文学的代表，分为婉约派和豪放派，句式灵活多变。',\n  '推荐': '我推荐李白的《静夜思》：床前明月光，疑是地上霜。举头望明月，低头思故乡。',\n  '解释': '请提供具体的诗句，我会为您详细解释其含义和背景。'\n};\n\nlet answer = '关于诗词的问题，我建议您查阅《唐诗三百首》或《宋词三百首》等经典选集。';\n\nfor (const [key, value] of Object.entries(knowledge)) {\n  if (question.includes(key)) {\n    answer = value;\n    break;\n  }\n}\n\nreturn [{ json: { answer, success: true } }];"
+      },
+      "id": "2",
+      "name": "诗词处理",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        460,
+        300
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "3",
+      "name": "响应",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        680,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "诗词处理",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "诗词处理": {
+      "main": [
+        [
+          {
+            "node": "响应",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

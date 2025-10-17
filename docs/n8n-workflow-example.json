@@ -1,0 +1,330 @@
+{
+  "name": "诗词AI助手工作流",
+  "description": "基于n8n的诗词AI助手工作流，处理用户提问并提供智能回复",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "poem-ai-assistant",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook",
+      "name": "诗词AI助手Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        240,
+        300
+      ],
+      "webhookId": "poem-ai-assistant"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 解析用户输入\nconst { question, context, userId } = $input.first().json;\n\n// 简单的意图识别\nconst intent = {\n  '推荐': 'recommendation',\n  '解释': 'explanation',\n  '介绍': 'introduction',\n  '什么': 'definition',\n  '区别': 'comparison',\n  '如何': 'method',\n  '为什么': 'reason'\n};\n\nlet detectedIntent = 'general';\nfor (const [keyword, intentType] of Object.entries(intent)) {\n  if (question.includes(keyword)) {\n    detectedIntent = intentType;\n    break;\n  }\n}\n\n// 返回处理后的数据\nreturn [{\n  json: {\n    originalQuestion: question,\n    detectedIntent: detectedIntent,\n    context: context || '诗词欣赏',\n    userId: userId || 'anonymous',\n    timestamp: new Date().toISOString(),\n    processing: true\n  }\n}];"
+      },
+      "id": "function",
+      "name": "意图识别",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        460,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "rightValue": ""
+          },
+          "conditions": [
+            {
+              "id": "intent-check",
+              "leftValue": "={{ $json.detectedIntent }}",
+              "rightValue": "recommendation",
+              "operator": "equal"
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if",
+      "name": "推荐意图判断",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        680,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// 诗词推荐逻辑\nconst poemRecommendations = {\n  '唐诗': {\n    title: '《静夜思》 - 李白',\n    content: '床前明月光，疑是地上霜。举头望明月，低头思故乡。',\n    analysis: '这首诗语言简练，意境深远，表达了游子思乡之情。'\n  },\n  '宋词': {\n    title: '《水调歌头》 - 苏轼',\n    content: '明月几时有？把酒问青天。不知天上宫阙，今夕是何年。',\n    analysis: '这首词意境开阔，情感真挚，展现了苏轼的豪放词风。'\n  },\n  'default': {\n    title: '《春晓》 - 孟浩然',\n    content: '春眠不觉晓，处处闻啼鸟。夜来风雨声，花落知多少。',\n    analysis: '这首诗描绘春日清晨的景色，语言清新自然。'\n  }\n};\n\nconst question = $input.first().json.originalQuestion.toLowerCase();\nlet recommendation = poemRecommendations.default;\n\nif (question.includes('唐诗')) {\n  recommendation = poemRecommendations['唐诗'];\n} else if (question.includes('宋词')) {\n  recommendation = poemRecommendations['宋词'];\n}\n\nreturn [{\n  json: {\n    answer: `我为您推荐：${recommendation.title}\\n\\n${recommendation.content}\\n\\n${recommendation.analysis}`,\n    type: 'recommendation',\n    confidence: 0.9\n  }\n}];"
+      },
+      "id": "function1",
+      "name": "诗词推荐",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        880,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "rightValue": ""
+          },
+          "conditions": [
+            {
+              "id": "intent-check",
+              "leftValue": "={{ $json.detectedIntent }}",
+              "rightValue": "explanation",
+              "operator": "equal"
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if1",
+      "name": "解释意图判断",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        680,
+        360
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// 诗词解释逻辑\nconst explanations = {\n  '床前明月光': '出自李白的《静夜思》。这里的\"床\"可能指井栏或坐具，月光洒在床前，营造出宁静的夜晚氛围。',\n  '大江东去': '出自苏轼的《念奴娇·赤壁怀古》，开篇气势恢宏，借长江东流抒发对历史变迁的感慨。',\n  '人生若只如初见': '出自纳兰性德的《木兰花》，表达对美好初见的怀念和对现实变迁的感慨。'\n};\n\nconst question = $input.first().json.originalQuestion;\nlet explanation = '这个问题涉及到诗词的深层含义，建议结合具体诗词的创作背景和作者生平来理解。';\n\nfor (const [keyword, desc] of Object.entries(explanations)) {\n  if (question.includes(keyword)) {\n    explanation = desc;\n    break;\n  }\n}\n\nreturn [{\n  json: {\n    answer: explanation,\n    type: 'explanation',\n    confidence: 0.85\n  }\n}];"
+      },
+      "id": "function2",
+      "name": "诗词解释",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        880,
+        360
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "rightValue": ""
+          },
+          "conditions": [
+            {
+              "id": "intent-check",
+              "leftValue": "={{ $json.detectedIntent }}",
+              "rightValue": "general",
+              "operator": "equal"
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if2",
+      "name": "通用意图判断",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        680,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// 通用回复逻辑\nconst question = $input.first().json.originalQuestion;\n\nreturn [{\n  json: {\n    answer: `关于\"${question}\"，这是一个很好的诗词问题！中国诗词文化博大精深，涉及到丰富的文学知识和历史背景。建议您查阅相关诗词典籍或咨询专业的文学老师获得更详细的解答。`,\n    type: 'general',\n    confidence: 0.7\n  }\n}];"
+      },
+      "id": "function3",
+      "name": "通用回复",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        880,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "waitForAll"
+      },
+      "id": "merge",
+      "name": "合并回复",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 1,
+      "position": [
+        1080,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// 格式化最终回复\nconst responses = $input.all();\nconst finalResponse = responses[0]?.json || {\n  answer: '抱歉，暂时无法处理您的请求，请稍后再试。',\n  type: 'error',\n  confidence: 0.3\n};\n\nreturn [{\n  json: {\n    success: true,\n    data: {\n      answer: finalResponse.answer,\n      type: finalResponse.type,\n      confidence: finalResponse.confidence,\n      timestamp: new Date().toISOString(),\n      sources: ['中国诗词数据库', '文学典籍', '历史文献']\n    }\n  }\n}];"
+      },
+      "id": "function4",
+      "name": "格式化回复",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        1280,
+        300
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "webhook1",
+      "name": "返回响应",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        1480,
+        300
+      ],
+      "webhookId": "poem-ai-assistant-response"
+    }
+  ],
+  "connections": {
+    "webhook": {
+      "main": [
+        [
+          {
+            "node": "function",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "function": {
+      "main": [
+        [
+          {
+            "node": "if",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "if": {
+      "main": [
+        [
+          {
+            "node": "function1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "if1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "if1": {
+      "main": [
+        [
+          {
+            "node": "function2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "if2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "if2": {
+      "main": [
+        [
+          {
+            "node": "function3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "function1": {
+      "main": [
+        [
+          {
+            "node": "merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "function2": {
+      "main": [
+        [
+          {
+            "node": "merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "function3": {
+      "main": [
+        [
+          {
+            "node": "merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "merge": {
+      "main": [
+        [
+          {
+            "node": "function4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "function4": {
+      "main": [
+        [
+          {
+            "node": "webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "tags": [],
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

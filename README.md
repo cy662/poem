@@ -12,6 +12,7 @@
 - 👤 **作者信息**: 了解诗词作者生平
 - 🛠️ **管理后台**: 添加和管理诗词数据
 - ☁️ **云端存储**: 基于Supabase的实时数据同步
+- 🤖 **AI助手**: 悬浮式诗词AI助手，基于n8n工作流
 
 ## 技术栈
 
@@ -20,6 +21,7 @@
 - **路由管理**: Vue Router
 - **UI组件**: 原生CSS + 响应式设计
 - **后端服务**: Supabase (PostgreSQL + 实时API)
+- **AI集成**: n8n工作流自动化
 - **构建工具**: Vite
 
 ## 快速开始
@@ -40,14 +42,20 @@ npm install
 复制环境配置文件并设置Supabase连接信息：
 
 ```bash
-cp .env.development .env.local
+cp .env.example .env.local
 ```
 
-编辑 `.env.local` 文件，设置您的Supabase配置：
+编辑 `.env.local` 文件，设置您的配置：
 
 ```env
+# Supabase配置
 VITE_SUPABASE_URL=您的Supabase项目URL
 VITE_SUPABASE_ANON_KEY=您的Supabase匿名密钥
+
+# n8n集成配置（可选）
+VITE_N8N_BASE_URL=http://localhost:5678
+VITE_N8N_WEBHOOK_PATH=/webhook/poem-ai-assistant
+VITE_N8N_API_KEY=your-n8n-api-key
 ```
 
 ### 启动开发服务器
@@ -124,7 +132,19 @@ src/
 - 作者信息查询
 - 分类数据管理
 
-### 3. 管理后台 (`src/views/AdminView.vue`)
+### 3. AI助手服务 (`src/services/n8nService.ts`)
+
+- 诗词AI问答功能
+- n8n工作流集成
+- 智能意图识别
+
+### 4. AI助手组件 (`src/components/AIAssistant.vue`)
+
+- 悬浮式聊天界面
+- 快速问题建议
+- 实时对话交互
+
+### 5. 管理后台 (`src/views/AdminView.vue`)
 
 - 添加新诗词
 - 查看数据统计
@@ -144,6 +164,11 @@ src/
 - `GET /authors` - 获取所有作者
 - `GET /authors/:id` - 获取指定作者详情
 - `GET /authors/dynasty/:dynasty` - 按朝代获取作者
+
+### AI助手接口
+
+- `POST /webhook/poem-ai-assistant` - AI助手问答接口
+- 支持意图识别、诗词推荐、解释等功能
 
 ## 开发指南
 
@@ -173,6 +198,53 @@ interface Poem {
 }
 ```
 
+## AI助手功能使用指南
+
+### 功能特点
+
+- **悬浮式设计**: 右下角悬浮按钮，随时可用
+- **智能问答**: 支持诗词推荐、解释、作者介绍等
+- **快速提问**: 内置常用问题模板
+- **n8n集成**: 可扩展的工作流架构
+
+### 使用方式
+
+1. 点击右下角的🤖机器人图标打开AI助手面板
+2. 选择快速问题或输入自定义问题
+3. 查看AI助手的智能回复
+4. 继续对话或关闭面板
+
+### n8n工作流配置
+
+项目提供了完整的n8n工作流示例：
+
+```bash
+docs/n8n-workflow-example.json
+```
+
+#### 工作流功能
+
+1. **意图识别**: 自动识别用户问题类型
+2. **诗词推荐**: 根据关键词推荐相关诗词
+3. **诗词解释**: 解释特定诗句的含义
+4. **通用回复**: 处理其他类型的问题
+
+#### 部署n8n工作流
+
+1. 安装n8n: `npm install -g n8n`
+2. 启动n8n: `n8n start`
+3. 导入工作流文件: `docs/n8n-workflow-example.json`
+4. 配置环境变量
+5. 激活工作流
+
+### 自定义扩展
+
+您可以扩展AI助手功能：
+
+1. **添加知识库**: 在 `src/services/n8nService.ts` 中扩展知识库
+2. **集成真实AI**: 替换模拟API为真实的AI服务
+3. **自定义工作流**: 修改n8n工作流逻辑
+
 ## 部署说明
 
 ### Vercel部署
@@ -184,6 +256,14 @@ interface Poem {
 ### 其他平台
 
 确保设置正确的环境变量和构建配置。
+
+### n8n服务部署
+
+AI助手功能需要n8n服务支持：
+
+1. **本地部署**: 适合开发和测试
+2. **云服务**: 使用n8n.cloud或其他云平台
+3. **Docker部署**: 使用官方Docker镜像
 
 ## 贡献指南
 

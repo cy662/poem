@@ -14,6 +14,9 @@
     
     <!-- 应用底部 -->
     <AppFooter />
+
+    <!-- 悬浮AI助手 -->
+    <AIAssistant />
   </div>
 </template>
 
@@ -22,6 +25,7 @@ import { onMounted } from 'vue'
 import { RouterView } from 'vue-router'
 import AppHeader from '@/components/AppHeader.vue'
 import AppFooter from '@/components/AppFooter.vue'
+import AIAssistant from '@/components/AIAssistant.vue'
 import { usePoemStore } from '@/stores/poem'
 
 // 使用诗词数据store
